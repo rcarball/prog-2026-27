@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía interactiva de Git y GitHub en Eclipse</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'JetBrains Mono', monospace; }
+        .tab-btn.active {
+            background-color: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-4">
+            <!-- Left Branding Group: Git Title -->
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-brand-500 text-white rounded-xl shadow-sm flex-shrink-0">
+                    <i class="fa-brands fa-git-alt text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Guía interactiva de Git y GitHub en Eclipse</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Programación de aplicaciones & Programación III</p>
+                </div>
+            </div>
+
+            <!-- Right Controls: Search & Dark Mode -->
+            <div class="flex items-center gap-3 w-full sm:w-auto flex-wrap sm:flex-nowrap justify-end">
+                <div class="relative flex-1 sm:w-56">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="guideSearch" onkeyup="filterGuide()" placeholder="Buscar en la guía..." class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                
+                <button onclick="toggleDarkMode()" class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Cambiar tema">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Tabs Navigation -->
+        <div class="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
+            <button onclick="switchTab('tab-1')" id="btn-tab-1" class="tab-btn active px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2">
+                <i class="fa-brands fa-github"></i> 1. Creación del repositorio en GitHub
+            </button>
+            <button onclick="switchTab('tab-2')" id="btn-tab-2" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-key"></i> 2. Autoría de commits y acceso a GitHub
+            </button>
+            <button onclick="switchTab('tab-3')" id="btn-tab-3" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> 3. Publicación e importación de proyectos
+            </button>
+            <button onclick="switchTab('tab-4')" id="btn-tab-4" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-rotate"></i> 4. Rutina de trabajo para evitar conflictos
+            </button>
+            <button onclick="switchTab('tab-5')" id="btn-tab-5" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-code-merge"></i> 5. Gestión de conflictos y Merge Tool
+            </button>
+        </div>
+
+        <section id="tab-1" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-brands fa-github text-brand-500"></i> Creación del repositorio remoto y trabajo en equipo
+                    </h2>
+                    <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800">
+                        Inicio del proyecto
+                    </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Para iniciar un proyecto grupal, una de las personas del equipo debe encargarse de crear el repositorio en GitHub e invitar al resto de integrantes y al equipo docente.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="searchable bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                        <h3 class="font-semibold text-sm text-brand-600 dark:text-brand-400 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">1</span>
+                            Creación del repositorio
+                        </h3>
+                        <ol class="list-decimal pl-5 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                            <li>Accede a <a href="https://github.com" target="_blank" class="text-brand-500 font-medium underline hover:text-brand-600">GitHub</a> e inicia sesión con tu cuenta corporativa.</li>
+                            <li>Haz clic en el botón <strong>New</strong> (Nuevo repositorio).</li>
+                            <li>Escribe el nombre del repositorio para la práctica o proyecto.</li>
+                            <li><strong class="text-amber-600 dark:text-amber-400">Importante:</strong> Mantén el repositorio completamente vacío (no marques las casillas para añadir <i>README</i>, <i>.gitignore</i> o <i>License</i>).</li>
+                            <li>Haz clic en <strong>Create repository</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <div class="searchable bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                        <h3 class="font-semibold text-sm text-brand-600 dark:text-brand-400 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">2</span>
+                            Añadir colaboradores
+                        </h3>
+                        <ol class="list-decimal pl-5 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                            <li>En la página de tu repositorio recién creado, entra en <strong>Settings</strong>.</li>
+                            <li>En el menú lateral, selecciona <strong>Collaborators</strong>.</li>
+                            <li>Haz clic en el botón <strong>Add people</strong>.</li>
+                            <li>Introduce el correo o usuario de GitHub de los miembros del grupo y del profesorado e invítalos.</li>
+                            <li>Las personas invitadas deberán aceptar la invitación recibida por correo o notificación en GitHub.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-2" class="tab-content hidden space-y-6">
+            <!-- Author Config -->
+            <div class="searchable bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-brand-500"></i> Identificación de la autoría de los commits
+                </h2>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Configura en Eclipse los datos de identificación que se asociarán a tus aportaciones al proyecto para que se atribuyan correctamente en GitHub:
+                </p>
+                <div class="bg-slate-100 dark:bg-slate-700/50 p-4 rounded-xl text-xs space-y-2 border border-slate-200 dark:border-slate-600/50">
+                    <p class="font-mono text-brand-600 dark:text-brand-400 font-semibold">Window &gt; Preferences &gt; Team &gt; Git &gt; Configuration (o Preferences &gt; Git &gt; User)</p>
+                    <p class="text-slate-600 dark:text-slate-300">Añade o verifica las entradas <code class="bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-bold">user.name</code> (tu nombre completo) y <code class="bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-bold">user.email</code> (usa la dirección @opendeusto.es registrada en GitHub).</p>
+                </div>
+            </div>
+
+            <!-- Token Generation -->
+            <div class="searchable bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-emerald-500"></i> Conexión mediante Token de Acceso Personal (PAT)
+                    </h2>
+                    <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        Método estándar para la asignatura
+                    </span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Para simplificar el acceso y evitar problemas de configuración con claves locales, utilizamos la conexión HTTPS autenticada mediante un Token de Acceso Personal (PAT). GitHub no permite usar tu contraseña habitual para operaciones de Git; en su lugar usarás este token.
+                </p>
+
+                <div class="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                    <h3 class="font-semibold text-sm text-brand-600 dark:text-brand-400 flex items-center gap-2">
+                        <i class="fa-solid fa-key"></i> Pasos para generar tu Token de Acceso en GitHub
+                    </h3>
+                    <ol class="list-decimal list-inside text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                        <li>En GitHub, entra en tu foto de perfil (esquina superior derecha) y selecciona <strong>Settings</strong>.</li>
+                        <li>En el menú lateral izquierdo, pulsa en <strong>Developer settings</strong> (al final del menú).</li>
+                        <li>Navega a <strong>Personal access tokens &gt; Tokens (classic)</strong>.</li>
+                        <li>Haz clic en <strong>Generate new token &gt; Generate new token (classic)</strong>.</li>
+                        <li>En <i>Note</i>, escribe un nombre descriptivo (ej. <code class="font-mono text-brand-600 dark:text-brand-400">Eclipse Deusto Token</code>).</li>
+                        <li>Establece una fecha de caducidad (se recomienda la duración del cuatrimestre).</li>
+                        <li>Marca la casilla del scope principal <strong>repo</strong> (esto seleccionará los permisos necesarios para gestionar repositorios).</li>
+                        <li>Desplázate al final y haz clic en <strong>Generate token</strong>.</li>
+                    </ol>
+
+                    <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-800 dark:text-amber-300 space-y-1">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Importante:
+                        </p>
+                        <p>Copia y guarda el token generado inmediatamente en un lugar seguro. GitHub <strong>no volverá a mostrártelo</strong> una vez abandones la página. Usarás este token como tu contraseña siempre que Eclipse te solicite credenciales para GitHub.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-3" class="tab-content hidden space-y-6">
+            <!-- Publishing Accordion / Steps -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up text-brand-500"></i> Publicar un proyecto de Eclipse en GitHub
+                </h2>
+
+                <div class="space-y-4">
+                    <!-- Step 1 -->
+                    <div class="searchable bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer" onclick="toggleAccordion('acc-1')">
+                            <span class="font-semibold text-sm flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">1</span>
+                                Vincular repositorio local
+                            </span>
+                            <i id="acc-1-icon" class="fa-solid fa-chevron-down text-slate-400"></i>
+                        </div>
+                        <div id="acc-1" class="p-4 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                            <p>Haz clic derecho sobre el proyecto &gt; <code class="bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded">Team &gt; Share Project</code>.</p>
+                            <p>Marca la casilla <strong>"Use or create repository in parent folder of project"</strong>, selecciona el proyecto, pulsa <strong>Create Repository</strong> y finaliza con <strong>Finish</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Gitignore File Creation -->
+                    <div class="searchable bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer" onclick="toggleAccordion('acc-2')">
+                            <span class="font-semibold text-sm flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">2</span>
+                                Creación del fichero .gitignore
+                            </span>
+                            <i id="acc-2-icon" class="fa-solid fa-chevron-down text-slate-400"></i>
+                        </div>
+                        <div id="acc-2" class="p-4 text-xs text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+                            <p>
+                                Antes de realizar el primer commit, crea un archivo de texto llamado <code class="font-mono text-brand-600 dark:text-brand-400 font-bold">.gitignore</code> en la carpeta raíz de tu proyecto. Este fichero evita subir archivos compilados y configuraciones locales que suelen provocar conflictos entre los miembros del equipo.
+                            </p>
+
+                            <div class="bg-[#fdf6e3] dark:bg-[#002b36] text-[#586e75] dark:text-[#839496] p-4 rounded-xl space-y-2 border border-[#eee8d5] dark:border-[#073642] shadow-sm">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-mono text-xs text-[#b58900] dark:text-[#b58900] font-semibold">Contenido recomendado para .gitignore</span>
+                                    <button onclick="copyGitignore()" class="px-2.5 py-1 bg-[#eee8d5] hover:bg-[#e2dac4] dark:bg-[#073642] dark:hover:bg-[#0d4b5a] text-xs rounded-lg text-[#586e75] dark:text-[#839496] font-medium transition-colors flex items-center gap-1.5 border border-[#d3c7ad] dark:border-[#0f5261]">
+                                        <i class="fa-regular fa-copy"></i> Copiar contenido
+                                    </button>
+                                </div>
+                                <pre id="gitignoreContent" class="text-xs overflow-x-auto leading-relaxed pt-1 text-[#586e75] dark:text-[#839496]"><code># Código compilado
+*.class
+/bin/
+
+# Eclipse
+.metadata/
+.settings/
+.project
+.classpath
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Ficheros de SQLite
+*.db
+*.db-journal
+
+# Ficheros del sistema operativo
+.DS_Store
+Thumbs.db</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: First Commit -->
+                    <div class="searchable bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer" onclick="toggleAccordion('acc-3')">
+                            <span class="font-semibold text-sm flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">3</span>
+                                Primer commit local
+                            </span>
+                            <i id="acc-3-icon" class="fa-solid fa-chevron-down text-slate-400"></i>
+                        </div>
+                        <div id="acc-3" class="p-4 text-xs text-slate-600 dark:text-slate-300 space-y-3 leading-relaxed">
+                            <p>
+                                Puedes acceder a la vista de confirmación de dos formas equivalentes:
+                            </p>
+                            <ul class="list-disc list-inside space-y-1 pl-2">
+                                <li>Haciendo clic derecho sobre el proyecto y seleccionando <code class="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded font-semibold text-brand-600 dark:text-brand-400">Team &gt; Commit...</code></li>
+                                <li>O abriendo directamente el panel <code class="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded font-semibold">Git Staging</code>.</li>
+                            </ul>
+                            <ol class="list-decimal list-inside space-y-1.5 text-xs pt-1">
+                                <li>Arrastra tus clases <code class="text-brand-600 dark:text-brand-400 font-mono">.java</code>, recursos y el fichero <code class="text-brand-600 dark:text-brand-400 font-mono">.gitignore</code> recién creado a <strong>Staged Changes</strong>.</li>
+                                <li>Escribe un mensaje explicativo (ej: <i>"Initial commit"</i>).</li>
+                                <li>Pulsa el botón <strong>Commit</strong> (para el primer commit del repositorio).</li>
+                            </ol>
+                            <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg text-xs text-amber-800 dark:text-amber-300">
+                                <strong><i class="fa-solid fa-triangle-exclamation"></i> ¿Por qué no pulsar 'Commit and Push' la primera vez?</strong><br>
+                                Al ser el primer commit, el repositorio local aún no conoce la URL remota HTTPS de GitHub. Si pulsas <i>Commit and Push</i> se producirá un error por falta de origen configurado (Upstream).
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: First Push -->
+                    <div class="searchable bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer" onclick="toggleAccordion('acc-4')">
+                            <span class="font-semibold text-sm flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center font-bold">4</span>
+                                Primer push a GitHub
+                            </span>
+                            <i id="acc-4-icon" class="fa-solid fa-chevron-down text-slate-400"></i>
+                        </div>
+                        <div id="acc-4" class="p-4 text-xs text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+                            <p>Haz clic derecho sobre el proyecto &gt; <code class="bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded">Team &gt; Push HEAD...</code></p>
+                            <ul class="list-disc list-inside space-y-1.5 text-xs">
+                                <li>Copia la URL <strong>HTTPS</strong> de tu repositorio de GitHub (se obtiene desde el botón verde <i>Code</i> en GitHub) y pégala en el campo <strong>URI</strong>.</li>
+                                <li>En el campo <strong>User</strong> introduce tu nombre de usuario de GitHub.</li>
+                                <li>En el campo <strong>Password</strong> pega tu <strong>Token de Acceso Personal (PAT)</strong>. Marca la casilla para guardar credenciales.</li>
+                                <li>Asegúrate de que la rama remota coincide (<code class="font-mono">main</code> o <code class="font-mono">master</code>).</li>
+                                <li>Pulsa <strong>Push</strong>. A partir de este momento ya podrás utilizar directamente el botón <i>Commit and Push</i> o <code class="font-mono bg-slate-100 dark:bg-slate-700 px-1 rounded">Team &gt; Push to Upstream</code> para futuras entregas.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Box with Highlighted Java Conversion -->
+            <div class="searchable bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-import text-brand-500"></i> Importación de un proyecto desde GitHub
+                </h2>
+                <div class="bg-amber-50 dark:bg-amber-950/40 p-3.5 rounded-xl border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                    <strong><i class="fa-solid fa-circle-info"></i> Importante:</strong> Al no subir la configuración propia de Eclipse (gracias al <code class="font-mono">.gitignore</code>), debes importar mediante Smart Import:
+                    <br>
+                    <code class="font-semibold text-amber-900 dark:text-amber-200">File &gt; Import &gt; Projects from Git (with smart import) &gt; Clone URI</code>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Pega la URL HTTPS del repositorio. Introduce tu usuario de GitHub y tu Token PAT cuando se soliciten credenciales.
+                </p>
+
+                <!-- Highlighted Java Conversion Box -->
+                <div class="p-4 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/80 rounded-xl text-xs text-sky-900 dark:text-sky-200 space-y-1.5 shadow-sm">
+                    <p class="font-bold flex items-center gap-2 text-sky-700 dark:text-sky-300 text-xs">
+                        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i> Configuración como proyecto Java tras la importación:
+                    </p>
+                    <p class="leading-relaxed">
+                        Si tras importar el proyecto Eclipse no lo detecta automáticamente como un proyecto de Java (debido a que los archivos de entorno fueron omitidos por el <code class="font-mono">.gitignore</code>), haz clic derecho sobre el proyecto en el explorador de paquetes y selecciona:
+                    </p>
+                    <p class="font-mono font-semibold text-sky-800 dark:text-sky-200 bg-white dark:bg-slate-800 px-2.5 py-1 rounded border border-sky-200 dark:border-sky-700/80 inline-block">
+                        Configure &gt; Convert to Java Project
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-4" class="tab-content hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-spin text-brand-500"></i> Rutina para coordinar el trabajo y minimizar conflictos
+                </h2>
+                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Para minimizar la aparición de conflictos al trabajar en equipo, sigue este orden en cada sesión de trabajo:
+                </p>
+
+                <!-- Cycle Diagram Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                    <!-- Step 1 -->
+                    <div class="searchable bg-white dark:bg-slate-800 p-5 rounded-xl border-t-4 border-blue-500 border-x border-b border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-blue-600 dark:text-blue-400 font-bold text-xs">
+                            <span>PASO 1</span>
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm">PULL (al empezar)</h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Descarga los cambios enviados por el resto del equipo antes de programar.</p>
+                        <div class="bg-slate-100 dark:bg-slate-700/60 p-2 rounded-lg text-[11px] font-mono text-center font-semibold text-slate-700 dark:text-slate-200">Team &gt; Pull</div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="searchable bg-white dark:bg-slate-800 p-5 rounded-xl border-t-4 border-emerald-500 border-x border-b border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+                            <span>PASO 2</span>
+                            <i class="fa-solid fa-code"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm">CÓDIGO Y COMMIT</h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Desarrolla tus tareas realizando commits frecuentes.</p>
+                        <div class="bg-slate-100 dark:bg-slate-700/60 p-2 rounded-lg text-[11px] font-mono text-center font-semibold text-slate-700 dark:text-slate-200">Team &gt; Commit...</div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="searchable bg-white dark:bg-slate-800 p-5 rounded-xl border-t-4 border-amber-500 border-x border-b border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-amber-600 dark:text-amber-400 font-bold text-xs">
+                            <span>PASO 3</span>
+                            <i class="fa-solid fa-sync"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm">PULL (antes de subir)</h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Sincroniza de nuevo por si se han publicado cambios mientras programabas.</p>
+                        <div class="bg-slate-100 dark:bg-slate-700/60 p-2 rounded-lg text-[11px] font-mono text-center font-semibold text-slate-700 dark:text-slate-200">Team &gt; Pull</div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="searchable bg-white dark:bg-slate-800 p-5 rounded-xl border-t-4 border-purple-500 border-x border-b border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                        <div class="flex justify-between items-center text-purple-600 dark:text-purple-400 font-bold text-xs">
+                            <span>PASO 4</span>
+                            <i class="fa-solid fa-upload"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-900 dark:text-white text-sm">PUSH</h3>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Envía tus commits al repositorio remoto en GitHub.</p>
+                        <div class="bg-slate-100 dark:bg-slate-700/60 p-2 rounded-lg text-[11px] font-mono text-center font-semibold text-slate-700 dark:text-slate-200">Team &gt; Push to Upstream</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-5" class="tab-content hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-code-merge text-rose-500"></i> Gestión y resolución de conflictos
+                    </h2>
+                    <p class="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                        Un conflicto ocurre cuando dos personas modifican la misma línea de código en un archivo y Git no puede determinar automáticamente cuál prevalece.
+                    </p>
+                </div>
+
+                <!-- Interactive Merge Tool Explainer -->
+                <div class="searchable bg-slate-900 text-slate-100 p-5 rounded-2xl space-y-4 border border-slate-800 shadow-inner">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <span class="text-xs font-semibold text-rose-400 flex items-center gap-2">
+                            <i class="fa-solid fa-bug"></i> Desmitificando las marcas de conflicto en el código fuente
+                        </span>
+                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono">Editor de texto / Eclipse</span>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Si abres un archivo en conflicto sin usar una herramienta gráfica, verás estas marcas escritas directamente en tu código Java. <strong>¡No te asustes!</strong> Este es su significado:
+                    </p>
+
+                    <!-- Code Conflict Visualizer -->
+                    <div class="font-mono text-xs space-y-1 bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto">
+                        <div class="text-slate-500">// Código previo sin conflictos</div>
+                        <div class="text-emerald-400 font-bold bg-emerald-950/60 p-1.5 rounded border border-emerald-800/40">
+                            &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (Tus cambios locales)
+                        </div>
+                        <div class="text-emerald-300 pl-4 py-1">
+                            System.out.println("Hola desde mi ordenador local");
+                        </div>
+                        <div class="text-amber-400 font-bold bg-amber-950/60 p-1.5 rounded border border-amber-800/40">
+                            ======= (Línea separadora)
+                        </div>
+                        <div class="text-sky-300 pl-4 py-1">
+                            System.out.println("Hola desde la versión subida a GitHub");
+                        </div>
+                        <div class="text-sky-400 font-bold bg-sky-950/60 p-1.5 rounded border border-sky-800/40">
+                            &gt;&gt;&gt;&gt;&gt;&gt;&gt; commit_hash (Cambios remotos de GitHub)
+                        </div>
+                        <div class="text-slate-500">// Continuación del método</div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-2">
+                        <div class="p-3 bg-emerald-950/30 border border-emerald-800/50 rounded-xl text-emerald-300 leading-relaxed">
+                            <strong>1. Parte superior:</strong> Tu versión local (lo que tenías escrito en tu equipo antes de hacer Pull).
+                        </div>
+                        <div class="p-3 bg-amber-950/30 border border-amber-800/50 rounded-xl text-amber-800/50 rounded-xl text-amber-300 leading-relaxed">
+                            <strong>2. Separador (<code class="font-bold">=======</code>):</strong> Divide ambas versiones alternativas.
+                        </div>
+                        <div class="p-3 bg-sky-950/30 border border-sky-800/50 rounded-xl text-sky-300 leading-relaxed">
+                            <strong>3. Parte inferior:</strong> La versión remota que proviene de GitHub.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps to solve using Merge Tool -->
+                <div class="searchable space-y-3 pt-2">
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Resolución mediante la herramienta gráfica Merge Tool de Eclipse:</h3>
+                    <ol class="list-decimal list-inside text-xs text-slate-600 dark:text-slate-300 space-y-2.5 leading-relaxed">
+                        <li>Haz clic derecho sobre el archivo en conflicto (marcado con un icono rojo en el explorador) &gt; <code class="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded font-mono">Team &gt; Merge Tool</code>.</li>
+                        <li>Se abrirá un editor doble: la parte izquierda muestra tu código local y la derecha la versión de GitHub.</li>
+                        <li>Utiliza los botones con flechas en la barra superior para copiar los cambios válidos de un lado a otro o edita manualmente el resultado.</li>
+                        <li>Guarda el archivo resuelto (<code class="font-mono bg-slate-100 dark:bg-slate-700 px-1 rounded">Ctrl + S</code>).</li>
+                        <li>Abre la ventana de commit mediante <code class="bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded font-mono">Team &gt; Commit...</code> o el panel <i>Git Staging</i>, arrastra el archivo a <strong>Staged Changes</strong>, añade un mensaje (ej: <i>"Conflictos resueltos"</i>) y haz <strong>Commit and Push</strong>.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-12 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-slate-500 dark:text-slate-400">
+            
+            <!-- Left: Universidad de Deusto Official Website Link & Logo -->
+            <div class="flex flex-col items-center md:items-start space-y-1 flex-shrink-0 group">
+                <a href="https://www.deusto.es" target="_blank" rel="noopener noreferrer" class="block" title="Universidad de Deusto - Deustuko Unibertsitatea">
+                    <div class="h-12 px-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center gap-2.5 shadow-sm group-hover:border-brand-500 transition-colors">
+                        <img src="https://unavatar.io/instagram/udeusto" 
+                             alt="Universidad de Deusto Logo" 
+                             class="h-8 w-8 object-cover rounded-md border border-slate-200 dark:border-slate-700"
+                             onerror="this.src='https://graph.facebook.com/udeusto/picture?type=large'; this.onerror=function(){ this.style.display='none'; document.getElementById('deustoSvgFallbackFooter').classList.remove('hidden'); };">
+                        <div class="text-left leading-tight space-y-0.5">
+                            <span class="text-xs text-slate-700 dark:text-slate-200 block">Universidad de Deusto</span>
+                            <span class="text-xs text-slate-700 dark:text-slate-200 block">Deustuko Unibertsitatea</span>
+                        </div>
+                        <!-- Fallback SVG Emblem if image is blocked -->
+                        <div id="deustoSvgFallbackFooter" class="hidden flex items-center gap-2">
+                            <svg class="h-7 w-7 text-brand-600 dark:text-brand-400" viewBox="0 0 100 100" fill="currentColor">
+                                <path d="M50 5 L15 20 V50 C15 72 50 95 50 95 C50 95 85 72 85 50 V20 Z" fill="none" stroke="currentColor" stroke-width="6"/>
+                                <text x="50" y="58" font-family="sans-serif" font-weight="bold" font-size="28" text-anchor="middle" fill="currentColor">UD</text>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://www.deusto.es" target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i> deusto.es
+                </a>
+            </div>
+
+            <!-- Center: Main Footer Text -->
+            <div class="text-center space-y-1">
+                <p>
+                    Recurso elaborado por <a href="https://www.deusto.es/es/inicio/somos-deusto/equipo/profesores/598/profesor" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:underline font-medium">Roberto Carballedo</a> con <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:underline font-medium">Google Gemini</a> a partir del <a href="https://docs.google.com/document/d/1ek6zJ_3MuBxznGrcMCpKZCpBs_LoFI-GmzoX-DUrxYE" target="_blank" rel="noopener noreferrer" class="text-brand-500 hover:underline font-medium">documento original</a>.
+                </p>
+            </div>
+
+            <!-- Right: Assisted by AI SVG Banner + URL + Hover Tooltip Legend -->
+            <div class="flex flex-col items-center md:items-end space-y-1 flex-shrink-0 group relative">
+                <a href="https://ai-label.org/#assisted-ai" target="_blank" rel="noopener noreferrer" class="block transition-transform duration-200 group-hover:scale-105" title="Assisted by AI - ai-label.org">
+                    <img src="https://ai-label.org/image-pack/ai-label_banner-assisted-by-ai.svg" 
+                         alt="Assisted by AI Banner" 
+                         class="h-9 w-auto object-contain">
+                </a>
+                <a href="https://ai-label.org/#assisted-ai" target="_blank" rel="noopener noreferrer" class="text-[10px] font-mono text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i> ai-label.org/#assisted-ai
+                </a>
+
+                <!-- Tooltip Card on Hover displaying the Legend -->
+                <div class="absolute right-1/2 translate-x-1/2 md:translate-x-0 md:right-0 bottom-full mb-2 w-64 p-3 bg-slate-900 text-slate-100 text-[11px] rounded-xl shadow-xl border border-slate-700 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+                    <p class="font-bold text-emerald-400 mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-sparkles"></i> Asistido por IA (ai-label.org)
+                    </p>
+                    <p class="text-slate-300 leading-normal">Recurso creado con asistencia de Inteligencia Artificial cumpliendo las directrices de transparencia y autoría compartida.</p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <script>
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-brand-500', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active', 'bg-brand-500', 'text-white', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+        }
+
+        // Accordion Toggle
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            }
+        }
+
+        // Copy gitignore content
+        function copyGitignore() {
+            const code = document.getElementById('gitignoreContent').innerText;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('¡Contenido de .gitignore copiado al portapapeles!');
+            } catch (err) {
+                console.error('Error al copiar: ', err);
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // Live Filter / Search across tabs
+        function filterGuide() {
+            const input = document.getElementById('guideSearch').value.toLowerCase();
+            const searchableElements = document.querySelectorAll('.searchable');
+
+            searchableElements.forEach(el => {
+                const text = el.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    el.style.display = "";
+                } else {
+                    el.style.display = "none";
+                }
+            });
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+    </script>
+</body>
+</html>
