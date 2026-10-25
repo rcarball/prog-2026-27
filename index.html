@@ -56,13 +56,8 @@
                 </div>
             </div>
 
-            <!-- Right Controls: Search & Dark Mode -->
-            <div class="flex items-center gap-3 w-full sm:w-auto flex-wrap sm:flex-nowrap justify-end">
-                <div class="relative flex-1 sm:w-56">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="guideSearch" onkeyup="filterGuide()" placeholder="Buscar en la guía..." class="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                </div>
-                
+            <!-- Right Control: Dark Mode -->
+            <div class="flex items-center justify-end w-full sm:w-auto">
                 <button onclick="toggleDarkMode()" class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Cambiar tema">
                     <i class="fa-solid fa-moon dark:hidden"></i>
                     <i class="fa-solid fa-sun hidden dark:block"></i>
@@ -583,21 +578,6 @@ Thumbs.db</code></pre>
             } finally {
                 document.body.removeChild(textarea);
             }
-        }
-
-        // Live Filter / Search across tabs
-        function filterGuide() {
-            const input = document.getElementById('guideSearch').value.toLowerCase();
-            const searchableElements = document.querySelectorAll('.searchable');
-
-            searchableElements.forEach(el => {
-                const text = el.innerText.toLowerCase();
-                if (text.includes(input)) {
-                    el.style.display = "";
-                } else {
-                    el.style.display = "none";
-                }
-            });
         }
 
         // Dark Mode Toggle
